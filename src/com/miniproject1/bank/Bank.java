@@ -7,26 +7,22 @@ import java.util.Scanner;
 public class Bank {
 	private static List<User> users = new ArrayList<User>();
 	private static List<User> actList = new ArrayList<User>();
-	private static List<Admin> admins = new ArrayList<Admin>();
+	//private static List<Admin> admins = new ArrayList<Admin>();
 	static Scanner input = new Scanner(System.in);
 	static String currTask;
 	
 	public static void main(String[] args) {
 		Bank myBank = new Bank();
 		
-		Admin firstAdmin = new Admin("Bobbert");
+		//Admin firstAdmin = new Admin("Bobbert");
 		User firstUser = new User("Bobbert", "THEBobbert");
 		firstUser.setActivated(true);
 		firstUser.setAdmin(true);
 		firstUser.setBalance(1000000);
 		users.add(firstUser);
-		admins.add(firstAdmin);
+		//admins.add(firstAdmin);
 		
 		while(true) {
-			
-			System.out.println("=====BANK STATUS=====");
-			System.out.println("Users====");
-			System.out.println(users);
 			
 			System.out.println("Welcome, input \"login\" to log in or \"create\" to create a new account.");
 			
@@ -54,8 +50,25 @@ public class Bank {
 	}
 	
 	 public void createUser() {
-		System.out.println("Enter your name:");
-		String name = input.nextLine();
+		String name;
+		boolean found;
+		while(true) {
+			System.out.println("Enter your name:");
+			name = input.nextLine();
+			found = false;
+			for(User u: users) {
+				if(u.getName().equals(name)) {
+					found = true;
+					break;
+				}
+			}
+			if(found) {
+				System.out.println("That username is already taken.");
+				continue;
+			}
+			break;
+		}
+		
 		String password;
 		String password2;
 		
@@ -72,9 +85,6 @@ public class Bank {
 			}
 		}
 		users.add(new User(name, password));
-		/*System.out.println("================");
-		System.out.println(users);
-		System.out.println("================");*/
 		actList.add(new User(name,password));
 		System.out.println("Account created. Please wait for activation.");
 	}
@@ -112,8 +122,11 @@ public class Bank {
 					if(login.toLowerCase().equals("admin")) {
 						adminMenu();
 					}
-					else {
+					else if (login.toLowerCase().equals("user")){
 						userMenu(currUser);
+					}
+					else {
+						System.out.println("Input not found. Logging you out for safety.");
 					}
 				}
 				else {
@@ -187,9 +200,13 @@ public class Bank {
 				 boolean found = false;
 				 for(User u: actList) {
 					 if(u.getName().equals(name)) {
-						 u.setActivated(true);
 						 actList.remove(u);
-						 
+						 for(User u2: users) {
+							 if(u2.getName().equals(name)) {
+								 u2.setActivated(true);
+								 break;
+							 }
+						 }
 						 found = true;
 						 System.out.println("-----------");
 						 System.out.println(u);
@@ -207,19 +224,77 @@ public class Bank {
 			 else if(currTask.toLowerCase().equals("lock")) {
 				 System.out.println("Which account are you locking?");
 				 String name = input.nextLine();
+				 boolean found = false;
 				 for(User u : users) {
 					 if(u.getName().equals(name)) {
 						 u.setLocked(true);
+						 found = true;
 						 break;
 					 }
+					 System.out.println(u + "-------------");
 				 }
-				 System.out.println("User not found.");
+				 if(found) {
+					 System.out.println(name + " has been locked.");
+				 }
+				 else {
+					 System.out.println("User not found.");
+				 }
+				 
+			 }
+			 else if(currTask.toLowerCase().equals("unlock")) {
+				 System.out.println("Which account are you unlocking?");
+				 String name = input.nextLine();
+				 boolean found = false;
+				 for(User u : users) {
+					 if(u.getName().equals(name)) {
+						 u.setLocked(false);
+						 found = true;
+						 break;
+					 }
+					 System.out.println(u + "-------------");
+				 }
+				 if(found) {
+					 System.out.println(name + " has been unlocked.");
+				 }
+				 else {
+					 System.out.println("User not found.");
+				 }
+				 
+			 }
+			 else if(currTask.toLowerCase().equals("promote")) {
+				 System.out.println("Which account are you promoting?");
+				 String name = input.nextLine();
+				 boolean found = false;
+				 boolean alreadyAdmin = false;
+				 for(User u : users) {
+					 if(u.getName().equals(name)) {
+						 if(u.isAdmin()) {
+							 alreadyAdmin = true;
+							 break;
+						 }
+						 u.setAdmin(true);
+						 found = true;
+						 break;
+					 }
+					 System.out.println(u + "-------------");
+				 }
+				 if(found) {
+					 System.out.println(name + " has been promoted.");
+				 }
+				 else if(alreadyAdmin) {
+					 System.out.println("That user is already an admin.");
+				 }
+				 else {
+					 System.out.println("User not found.");
+				 }
 			 }
 			 else {
 				 System.out.println("Sorry, we don't understand your input. Here's a list of possible inputs.");
 				 System.out.println("\tactlist - to get a list of people waiting to be activated");
 				 System.out.println("\tactivate - to activate a user");
 				 System.out.println("\tlock - to lock a user");
+				 System.out.println("\tunlock - to unlock a user");
+				 System.out.println("\tpromote - to promote a user to admin");
 				 System.out.println("\tlogout - logout of your account");
 			 }
 		 }
