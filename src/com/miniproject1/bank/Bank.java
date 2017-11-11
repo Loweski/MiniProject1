@@ -189,6 +189,7 @@ public class Bank {
 					 if(u.getName().equals(name)) {
 						 u.setActivated(true);
 						 actList.remove(u);
+						 
 						 found = true;
 						 System.out.println("-----------");
 						 System.out.println(u);
