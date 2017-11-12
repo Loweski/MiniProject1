@@ -16,7 +16,7 @@ public class Bank {
 	static Scanner input = new Scanner(System.in);
 	static String currTask;
 	
-	final static Logger logger = Logger.getLogger(Bank.class.getName());
+	final static Logger logger = Logger.getLogger(Bank.class);
 
 	static ObjectOutputStream oos;
 	static ObjectInputStream ois;
