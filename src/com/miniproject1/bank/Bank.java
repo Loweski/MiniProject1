@@ -15,16 +15,15 @@ public class Bank {
 	private static List<User> actList = new ArrayList<User>();
 	static Scanner input = new Scanner(System.in);
 	static String currTask;
-	
+
 	final static Logger logger = Logger.getLogger(Bank.class);
 
 	static ObjectOutputStream oos;
 	static ObjectInputStream ois;
 
 	public static void main(String[] args) throws IOException {
-		
+
 		Bank myBank = new Bank();
-		
 
 		User firstUser = new User("Bobbert", "THEBobbert");
 		firstUser.setActivated(true);
@@ -164,7 +163,7 @@ public class Bank {
 		/*
 		 * Takes in the username and password
 		 */
-		System.out.println("Enter your name:");
+		System.out.println("Enter username:");
 		String name = input.nextLine();
 		System.out.println("Enter Password");
 		String password = input.nextLine();
@@ -256,15 +255,23 @@ public class Bank {
 				/*
 				 * A try block to see if the user enter a valid input.
 				 */
-				try {
-					user.withdraw(Double.parseDouble(amount));
-				} catch (NumberFormatException e) {
-					/*
-					 * Invalid Input is printed and the current task will end.
-					 */
-					System.out.println("Invalid Input");
-					logger.info(user.getName() + " entered an invalid input for withdrawal.");
+				if (Double.parseDouble(amount) < 0) {
+					System.out.println("You cannot withdraw negative amount.");
+					logger.info(user.getName() + " tried to withdraw a negative value.");
 				}
+				else {
+					try {
+						user.withdraw(Double.parseDouble(amount));
+						logger.info(user.getName() + "withdraw $" + amount);
+					} catch (NumberFormatException e) {
+						/*
+						 * Invalid Input is printed and the current task will end.
+						 */
+						System.out.println("Invalid Input");
+						logger.info(user.getName() + " entered an invalid input for withdrawal.");
+					}
+				}
+				
 
 			} else if (currTask.toLowerCase().contentEquals("deposit")) {
 				/*
@@ -272,12 +279,19 @@ public class Bank {
 				 */
 				System.out.println("How much would you like to deposit?");
 				String amount = input.nextLine();
-				try {
-					user.deposit(Double.parseDouble(amount));
-				} catch (NumberFormatException e) {
-					System.out.println("Invalid Input");
-					logger.info(user.getName() + " entered an invalid input for deposit.");
+				if (Double.parseDouble(amount) < 0) {
+					System.out.println("You cannot deposit negative amount.");
+					logger.info(user.getName() + " tried to deposit a negative value.");
+				} else {
+					try {
+						user.deposit(Double.parseDouble(amount));
+						logger.info(user.getName() + "deposited $" + amount);
+					} catch (NumberFormatException e) {
+						System.out.println("Invalid Input");
+						logger.info(user.getName() + " entered an invalid input for deposit.");
+					}
 				}
+
 			} else if (currTask.toLowerCase().contentEquals("balance")) {
 				// simply print the balance of the current user
 				user.printBalance();
@@ -317,8 +331,8 @@ public class Bank {
 				break;
 			} else if (currTask.toLowerCase().equals("actlist")) {
 				/*
-				 * Gives out a list of people waiting for activation
-				 * If there's no one, it will say there's none
+				 * Gives out a list of people waiting for activation If there's no one, it will
+				 * say there's none
 				 */
 				if (actList.size() == 0) {
 					System.out.println("There's no account waiting for activation.");
@@ -357,8 +371,8 @@ public class Bank {
 					}
 				}
 				/*
-				 * Then prints out that they've been activated if found,
-				 * otherwise prints out the account was not found.
+				 * Then prints out that they've been activated if found, otherwise prints out
+				 * the account was not found.
 				 */
 				if (found) {
 					System.out.println(name + " has been activated.");
@@ -412,9 +426,8 @@ public class Bank {
 				}
 				if (found) {
 					/*
-					 * Same as before, an admin cannot unlock his own account.
-					 * This is to avoid abuse from an admin that can unlock
-					 * themselves.
+					 * Same as before, an admin cannot unlock his own account. This is to avoid
+					 * abuse from an admin that can unlock themselves.
 					 */
 					if (user.getName().equals(name)) {
 						System.out.println("You cannot unlocked your own account.");
@@ -450,7 +463,8 @@ public class Bank {
 					}
 				}
 				/*
-				 * Prints out that the chose user is promoted, already an admin, or if the user couldn't be found.
+				 * Prints out that the chose user is promoted, already an admin, or if the user
+				 * couldn't be found.
 				 */
 				if (found) {
 					System.out.println(name + " has been promoted.");
