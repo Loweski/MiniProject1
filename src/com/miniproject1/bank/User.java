@@ -1,6 +1,13 @@
 package com.miniproject1.bank;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5138046776588954161L;
+	
 	//simple login credentials with balance
 	private String name;
 	private String password;
@@ -11,6 +18,13 @@ public class User {
 	private boolean locked;
 	private boolean admin;
 	
+	/**
+	 * The base constructor for a user that takes in the name and password for a user.
+	 * When an user is created, the default values is set $0, false, false, and false for
+	 * activated, locked, and admin respectively.
+	 * @param name - username for the account
+	 * @param password - password for the account
+	 */
 	public User(String name, String password) {
 		super();
 		this.name = name;
@@ -20,6 +34,8 @@ public class User {
 		locked = false;
 		admin = false;
 	}
+	
+	//all the getters and setters for the user's data
 	public String getName() {
 		return name;
 	}
@@ -62,6 +78,7 @@ public class User {
 		this.admin = admin;
 	}
 	
+	//Override hashCode() equals() to make it easier to compare
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -110,24 +127,35 @@ public class User {
 		return "User [name=" + name + ", password=" + password + ", balance=" + balance + ", activated=" + activated
 				+ ", locked=" + locked + ", admin=" + admin + "]\n";
 	}
+	
+	/**
+	 * Takes the user into withdrawing the amount in the parameter. If the amount exceeds the
+	 * balance, the withdrawal will be denied.
+	 * @param amount - amount to be withdrawn
+	 */
 	public void withdraw(double amount) {
 		if(amount > balance) {
 			System.out.println("Withdraw denied. Amount entered exceed current balance");
-			//INSERT CODE TO PRINT TO LOG HERE
 		}
 		else {
 			balance -= amount;
 			System.out.println("Withdraw approved.");
-			//INSERT CODE TO PRINT TO LOG HERE
 		}
+		//balance is always shown after each interaction
 		printBalance();
 	}
 	
+	/**
+	 * Takes the user into depositing the amount in the parameter. 
+	 * @param amount - Amount to be deposited
+	 */
 	public void deposit(double amount) {
 		balance += amount;
 		
 		System.out.println("Deposit approved.");
 		//INSERT CODE TO PRINT TO LOG HERE
+		
+		//balance is always shown after each interaction
 		printBalance();
 	}
 	
