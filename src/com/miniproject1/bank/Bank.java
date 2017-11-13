@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 public class Bank {
 	private static List<User> users = new ArrayList<User>();
 	private static List<User> actList = new ArrayList<User>();
+	private static List<String> loanList = new ArrayList<String>();
 	static Scanner input = new Scanner(System.in);
 	static String currTask;
 
@@ -258,8 +259,7 @@ public class Bank {
 				if (Double.parseDouble(amount) < 0) {
 					System.out.println("You cannot withdraw negative amount.");
 					logger.info(user.getName() + " tried to withdraw a negative value.");
-				}
-				else {
+				} else {
 					try {
 						user.withdraw(Double.parseDouble(amount));
 						logger.info(user.getName() + "withdraw $" + amount);
@@ -271,7 +271,6 @@ public class Bank {
 						logger.info(user.getName() + " entered an invalid input for withdrawal.");
 					}
 				}
-				
 
 			} else if (currTask.toLowerCase().contentEquals("deposit")) {
 				/*
@@ -295,6 +294,87 @@ public class Bank {
 			} else if (currTask.toLowerCase().contentEquals("balance")) {
 				// simply print the balance of the current user
 				user.printBalance();
+			}
+
+			else if (currTask.toLowerCase().contentEquals("loans")) {
+				// Asks if user is trying to pay or check off a loan
+				System.out.println("Are you taking out a loan, checking approval, paying off a loan?");
+				currTask = input.nextLine();
+				if (currTask.toLowerCase().contentEquals("taking")) {
+					if (user.isLoanApplied() == true) {
+						System.out.println("You've already applied for a loan."
+								+ " Please wait for for the approval process of the previous loan before"
+								+ " applying for a new one.");
+					}
+
+					else {
+						System.out.println("Entered the reason for the loan:");
+						user.setLoanMessage(input.nextLine());
+						System.out.println("Entered amount you need");
+						String amount = input.nextLine();
+						boolean done = false;
+						try {
+							user.setLoanAmount(Double.parseDouble(amount));
+							loanList.add(user.getName());
+							logger.info(user.getName() + " applied for a loan of $" + Double.parseDouble(amount)
+									+ ". \n Reason:" + user.getLoanMessage());
+							done = true;
+						} catch (NumberFormatException e) {
+							System.out.println("Invalid Input. Taking you back to the menu.");
+							logger.info(user.getName() + " entered an invalid input for a loan.");
+						}
+						if (done) {
+							user.setLoanApplied(true);
+							System.out.println("Your loan is now under process.");
+						}
+
+					}
+				} else if (currTask.toLowerCase().contentEquals("checking")) {
+					if (user.isLoanApplied() == false) {
+						System.out.println("You haven't applied for a loan.");
+					} else if (user.isLoanViewed() == true) {
+						System.out.println(user.getLoanMessage());
+						user.setLoanApplied(false);
+						user.setLoanViewed(false);
+					} else {
+						System.out.println("Your loan has not been viewed yet.");
+					}
+				} else if (currTask.toLowerCase().contentEquals("paying")) {
+					if (user.getDebt() <= 0) {
+						System.out.println("You don't have any debt.");
+					} else {
+						System.out.println("Current Debt: $" + user.getDebt());
+						System.out.println("How much are you paying today?");
+						String amount = input.nextLine();
+
+						try {
+							if (user.getBalance() < Double.parseDouble(amount)) {
+								System.out.println("You don't have enough to cover that payment.");
+							} else {
+								user.setBalance(user.getBalance() - Double.parseDouble(amount));
+								user.setDebt(user.getDebt() - Double.parseDouble(amount));
+								if (user.getDebt() < 0) {
+									System.out.println("You overpaid. Your change of $" + (-user.getDebt())
+											+ " has been added to your bank balance.");
+									user.setBalance(user.getBalance() - user.getDebt());
+									user.setDebt(0);
+								}
+								System.out.println("Current Debt: $" + (user.getDebt()));
+								logger.info(user.getName() + " paid $" + Double.parseDouble(amount) + " for his debt.");
+							}
+
+						} catch (NumberFormatException e) {
+							System.out.println("Invalid Input. Taking you back to the menu.");
+							logger.info(user.getName() + " entered an invalid input for paying off a loan.");
+						}
+					}
+
+				} else {
+					System.out.println("Sorry, we don't understand your input. Here's a list of possible inputs.");
+					System.out.println("\tchecking - check your loan status");
+					System.out.println("\tpaying - pay off your current debt");
+					System.out.println("\ttaking - take into the steps of taking out a loan");
+				}
 			} else if (currTask.toLowerCase().contentEquals("logout")) {
 				// log the user out
 				System.out.println("Logging out");
@@ -307,6 +387,7 @@ public class Bank {
 				System.out.println("Sorry, we don't understand your input. Here's a list of possible inputs.");
 				System.out.println("\twithdraw - take you to the withdraw menu");
 				System.out.println("\tdeposit - take you to the deposit menu");
+				System.out.println("\tloans - to take you to the loans menu");
 				System.out.println("\tbalance - print out your balance");
 				System.out.println("\tlogout - logout of your account");
 			}
@@ -344,7 +425,101 @@ public class Bank {
 					}
 				}
 
-			} else if (currTask.toLowerCase().equals("activate")) {
+			} else if (currTask.toLowerCase().equals("loanlist")) {
+				/*
+				 * Gives out a list of people waiting for a loan approval. If there's no one, it
+				 * will say there's none.
+				 */
+				if (loanList.size() == 0) {
+					System.out.println("There's no accounts waiting for a loan approval.");
+				} else {
+					System.out.println("Loan List:");
+					int i = 1;
+					for (String name : loanList) {
+						System.out.println("\t" + i + ". " + name);
+					}
+				}
+
+			} else if (currTask.toLowerCase().equals("loans")) {
+				System.out.println("Which account are you approving or denying a loan for?");
+				String name = input.nextLine();
+				boolean found = false;
+				/*
+				 * Looks for the user in the list
+				 */
+				for (String u : loanList) {
+					if (u.equals(name)) {
+						/*
+						 * When found, removes them from the list
+						 */
+						loanList.remove(u);
+						found = true;
+						break;
+					}
+				}
+				/*
+				 * The admin can then see the loan amount and message from the user and can
+				 * determine if they want to approve or denied the loan. If denied, the admin
+				 * will entered a reason why it was denied. For approved loans, the message will
+				 * simply said approved and by which admin
+				 */
+
+				if (found) {
+
+					if (user.getName().equals(name)) {
+						System.out.println("You cannot review your own loan.");
+					} else {
+						User loanUser = null;
+						for (User u2 : users) {
+							if (u2.getName().equals(name)) {
+								loanUser = u2;
+								break;
+							}
+						}
+
+						/*
+						 * User loanUser = null; for (User u2 : users) { if (u2.getName().equals(name))
+						 * { loanUser = u2; break; } }
+						 */
+						loanUser.setLoanViewed(true);
+						System.out.println(name);
+						System.out.println("\tAmount: $" + loanUser.getLoanAmount());
+						System.out.println("\tReason: " + loanUser.getLoanMessage());
+						while (true) {
+							System.out.println("Approve or deny?");
+							currTask = input.nextLine();
+							if (currTask.toLowerCase().equals("approve")) {
+								// Loan are on a base-line 10% interest
+								double newDebt = (loanUser.getLoanAmount() * .10) + loanUser.getLoanAmount();
+								loanUser.setDebt(newDebt);
+								loanUser.setLoanMessage("Loan approved by Admin:" + user.getName());
+								loanUser.setBalance(loanUser.getBalance() + loanUser.getLoanAmount());
+								logger.info(loanUser.getName() + " received a loan of" + " $" + loanUser.getLoanAmount()
+										+ " and approved by Admin " + user.getName());
+								System.out.println("Account approved.");
+								break;
+							} else if (currTask.toLowerCase().equals("deny")) {
+								System.out.println("Reason for denial?");
+								String message = input.nextLine();
+								loanUser.setLoanMessage("Loan denied. Reason: " + message);
+								logger.info(
+										loanUser.getName() + " was denied a loan of " + "$" + loanUser.getLoanAmount()
+												+ " by Admin " + user.getName() + " " + "because: " + message);
+								System.out.println("Account denied.");
+								break;
+							} else {
+								System.out.println("Invalid input. Please retype that in.");
+							}
+						}
+					}
+				} else {
+					System.out.println(
+							"Account not found. Type in loanlist to get a list of accounts waiting for approval.");
+				}
+
+			}
+
+			else if (currTask.toLowerCase().equals("activate")) {
 				System.out.println("Which account are you activating?");
 				String name = input.nextLine();
 				boolean found = false;
@@ -481,7 +656,9 @@ public class Bank {
 				 */
 				System.out.println("Sorry, we don't understand your input. Here's a list of possible inputs.");
 				System.out.println("\tactlist - to get a list of people waiting to be activated");
+				System.out.println("\tloanlist - to get a list of people waiting for a loan approval");
 				System.out.println("\tactivate - to activate a user");
+				System.out.println("\tloans - to approve or denied a loan");
 				System.out.println("\tlock - to lock a user");
 				System.out.println("\tunlock - to unlock a user");
 				System.out.println("\tpromote - to promote a user to admin");

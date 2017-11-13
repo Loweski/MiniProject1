@@ -53,9 +53,16 @@ public class BankTest {
 
 	@Test
 	public void testCreate() {
-		tester.setBalance(2000);
-		tester.deposit(200);
-		assertEquals(2200, tester.getBalance(),0.001);
+		
+		User newUser = new User("Bruce", "NotBatman");
+		
+		assertEquals("Bruce", newUser.getName());
+		assertEquals("NotBatman", newUser.getPassword());
+		assertEquals(0, newUser.getBalance(),0.001);
+		assertEquals(false, newUser.isActivated());
+		assertEquals(false, newUser.isLocked());
+		assertEquals(false, newUser.isAdmin());
+		
 	}
 
 }

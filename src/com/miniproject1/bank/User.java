@@ -13,6 +13,53 @@ public class User implements Serializable{
 	private String password;
 	private double balance;
 	
+	//Used for loan
+	private double debt;
+	private boolean loanApplied;
+	private double loanAmount;
+	private String loanMessage;
+	private boolean loanViewed;
+
+	public boolean isLoanViewed() {
+		return loanViewed;
+	}
+
+	public void setLoanViewed(boolean loanViewed) {
+		this.loanViewed = loanViewed;
+	}
+
+	public double getLoanAmount() {
+		return loanAmount;
+	}
+
+	public void setLoanAmount(double loanAmount) {
+		this.loanAmount = loanAmount;
+	}
+
+	public double getDebt() {
+		return debt;
+	}
+
+	public void setDebt(double debt) {
+		this.debt = debt;
+	}
+
+	public boolean isLoanApplied() {
+		return loanApplied;
+	}
+
+	public void setLoanApplied(boolean loanApplied) {
+		this.loanApplied = loanApplied;
+	}
+
+	public String getLoanMessage() {
+		return loanMessage;
+	}
+
+	public void setLoanMessage(String loanMessage) {
+		this.loanMessage = loanMessage;
+	}
+
 	//flags used to determine the status of the account
 	private boolean activated;
 	private boolean locked;
@@ -33,6 +80,13 @@ public class User implements Serializable{
 		activated = false;
 		locked = false;
 		admin = false;
+		
+		debt = 0;
+		loanApplied = false;
+		loanViewed = false;
+		loanAmount = 0;
+		loanMessage = "No message";
+		
 	}
 	
 	//all the getters and setters for the user's data
