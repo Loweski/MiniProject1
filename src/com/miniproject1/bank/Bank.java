@@ -256,20 +256,22 @@ public class Bank {
 				/*
 				 * A try block to see if the user enter a valid input.
 				 */
-				if (Double.parseDouble(amount) < 0) {
-					System.out.println("You cannot withdraw negative amount.");
-					logger.info(user.getName() + " tried to withdraw a negative value.");
-				} else {
-					try {
+
+				try {
+					if (Double.parseDouble(amount) < 0) {
+						System.out.println("You cannot withdraw negative amount.");
+						logger.info(user.getName() + " tried to withdraw a negative value.");
+					} else {
 						user.withdraw(Double.parseDouble(amount));
 						logger.info(user.getName() + "withdraw $" + amount);
-					} catch (NumberFormatException e) {
-						/*
-						 * Invalid Input is printed and the current task will end.
-						 */
-						System.out.println("Invalid Input");
-						logger.info(user.getName() + " entered an invalid input for withdrawal.");
 					}
+
+				} catch (NumberFormatException e) {
+					/*
+					 * Invalid Input is printed and the current task will end.
+					 */
+					System.out.println("Invalid Input");
+					logger.info(user.getName() + " entered an invalid input for withdrawal.");
 				}
 
 			} else if (currTask.toLowerCase().contentEquals("deposit")) {
@@ -278,17 +280,21 @@ public class Bank {
 				 */
 				System.out.println("How much would you like to deposit?");
 				String amount = input.nextLine();
-				if (Double.parseDouble(amount) < 0) {
-					System.out.println("You cannot deposit negative amount.");
-					logger.info(user.getName() + " tried to deposit a negative value.");
-				} else {
-					try {
+				try {
+					if (Double.parseDouble(amount) < 0) {
+						System.out.println("You cannot deposit negative amount.");
+						logger.info(user.getName() + " tried to deposit a negative value.");
+					} else {
 						user.deposit(Double.parseDouble(amount));
-						logger.info(user.getName() + "deposited $" + amount);
-					} catch (NumberFormatException e) {
-						System.out.println("Invalid Input");
-						logger.info(user.getName() + " entered an invalid input for deposit.");
+						logger.info(user.getName() + "deposit $" + amount);
 					}
+
+				} catch (NumberFormatException e) {
+					/*
+					 * Invalid Input is printed and the current task will end.
+					 */
+					System.out.println("Invalid Input");
+					logger.info(user.getName() + " entered an invalid input for deposit.");
 				}
 
 			} else if (currTask.toLowerCase().contentEquals("balance")) {
